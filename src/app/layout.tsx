@@ -2,16 +2,18 @@ import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
 import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
-import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toast";
+import Navbar from "@/components/Navbar";
+import { getServerSession } from "next-auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession();
   return (
     <html
       lang="en"
@@ -19,8 +21,8 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-slate-50 dark:bg-slate-900 antialiased">
         <Providers>
-          {/* @ts-expect-error Server Component */}
-          <Navbar />
+          <Navbar session={session} />
+
           {children}
           <Toaster position="bottom-right" />
         </Providers>
