@@ -3,7 +3,7 @@ import { VariantProps, cva } from "class-variance-authority";
 import { HTMLAttributes, forwardRef } from "react";
 
 const largeHeadingVariants = cva(
-  "text-back dark:text-white text-center lg:text-left font-extrabold leading-tight tracking-tighter",
+  "text-back dark:text-white text-center font-extrabold leading-tight tracking-tighter",
   {
     variants: {
       size: {
@@ -36,6 +36,6 @@ const LargeHeading = forwardRef<HTMLHeadingElement, LargeHeadingProps>(
   }
 );
 
-LargeHeading.displayName = 'LargeHeading'
+LargeHeading.displayName = "LargeHeading";
 
 export default LargeHeading;
