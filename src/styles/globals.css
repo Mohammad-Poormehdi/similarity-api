@@ -2,4 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
+.dark .simplebar-scrollbar::before {
+  background-color: white;
+}

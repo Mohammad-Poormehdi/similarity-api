@@ -1,0 +1,41 @@
+import { NextAuthOptions } from "next-auth";
+import { db } from "./db";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import GoogleProvider from "next-auth/providers/google";
+
+const getGoogleCredentilas = () => {
+  const clientID = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+  if (!clientID || clientID.length === 0) {
+    throw new Error("google client id is not set");
+  }
+  if (!clientSecret || clientSecret.length === 0) {
+    throw new Error("google client secret is not set");
+  }
+  return { clientID, clientSecret };
+};
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(db),
+  session: { strategy: "jwt" },
+  pages: { signIn: "/login" },
+  providers: [
+    GoogleProvider({
+      clientId: getGoogleCredentilas().clientID,
+      clientSecret: getGoogleCredentilas().clientSecret,
+    }),
+  ],
+  callbacks: {
+    async session({ token, session }) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.image = token.picture;
+      }
+      return session;
+    },
+
+  },
+};
