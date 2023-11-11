@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
+import ModalProvider from "@/providers/ModalProvider";
 
 interface ProvidersProps {
   children: ReactNode;
@@ -11,7 +12,10 @@ interface ProvidersProps {
 const Providers: React.FC<ProvidersProps> = ({ children }) => {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SessionProvider>{children}</SessionProvider>
+      <SessionProvider>
+        <ModalProvider />
+        {children}
+      </SessionProvider>
     </ThemeProvider>
   );
 };

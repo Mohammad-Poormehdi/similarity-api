@@ -13,6 +13,8 @@ declare module "next-auth/jwt" {
 
 declare module "next-auth" {
   interface Session {
-    user: User & { id: UserId };
+    user: User & {
+      id: UserId;
+    };
   }
 }

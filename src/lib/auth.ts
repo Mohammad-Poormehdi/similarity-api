@@ -1,29 +1,45 @@
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcrypt";
 import { NextAuthOptions } from "next-auth";
-import { db } from "./db";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import GoogleProvider from "next-auth/providers/google";
+import { db } from "./db";
+import GitHubProvider from "next-auth/providers/github";
 
-const getGoogleCredentilas = () => {
-  const clientID = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-
-  if (!clientID || clientID.length === 0) {
-    throw new Error("google client id is not set");
-  }
-  if (!clientSecret || clientSecret.length === 0) {
-    throw new Error("google client secret is not set");
-  }
-  return { clientID, clientSecret };
-};
-
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db),
-  session: { strategy: "jwt" },
-  pages: { signIn: "/login" },
+const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: getGoogleCredentilas().clientID,
-      clientSecret: getGoogleCredentilas().clientSecret,
+    // CredentialsProvider({
+    //   name: "credentials",
+    //   credentials: {
+    //     email: { label: "email", type: "text" },
+    //     password: { label: "password", type: "password" },
+    //   },
+    //   async authorize(credentials) {
+    //     if (!credentials?.email || !credentials.password) {
+    //       throw new Error("Invalid credentials");
+    //     }
+    //     const user = await db.user.findUnique({
+    //       where: {
+    //         email: credentials?.email,
+    //       },
+    //     });
+    //     if (!user || !user.hashedPassword) {
+    //       throw new Error("User Does not exists");
+    //     }
+    //     const comparedPassword = bcrypt.compare(
+    //       credentials?.password,
+    //       user?.hashedPassword
+    //     );
+    //     if (!comparedPassword) {
+    //       throw new Error("Invalid password");
+    //     }
+
+    //     return user;
+    //   },
+    // }),
+    // ,
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT as string,
+      clientSecret: process.env.GITHUB_SECRET as string,
     }),
   ],
   callbacks: {
@@ -36,23 +52,12 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async jwt({ token, user }) {
-      const dbUser = await db.user.findFirst({
-        where: { email: token.email },
-      });
-      if (!dbUser) {
-        token.id = user!.id;
-        return token;
-      }
-      return {
-        id: dbUser.id,
-        name: dbUser.name,
-        email: dbUser.email,
-        picture: dbUser.image,
-      };
-    },
-    redirect() {
-      return "/dashboard";
-    },
   },
+
+  adapter: PrismaAdapter(db as any),
+  pages: { signIn: "/" },
+  debug: process.env.NODE_ENV === "development",
+  session: { strategy: "jwt" },
+  secret: process.env.NEXTAUTH_SECRET,
 };
+export default authOptions;
